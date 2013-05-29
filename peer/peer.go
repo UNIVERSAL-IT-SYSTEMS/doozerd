@@ -2,12 +2,12 @@ package peer
 
 import (
 	"github.com/ha/doozer"
-	"github.com/ha/doozerd/consensus"
-	"github.com/ha/doozerd/gc"
-	"github.com/ha/doozerd/member"
-	"github.com/ha/doozerd/server"
-	"github.com/ha/doozerd/store"
-	"github.com/ha/doozerd/web"
+	"github.com/coreos/doozerd/consensus"
+	"github.com/coreos/doozerd/gc"
+	"github.com/coreos/doozerd/member"
+	"github.com/coreos/doozerd/server"
+	"github.com/coreos/doozerd/store"
+	"github.com/coreos/doozerd/web"
 	"io"
 	"log"
 	"net"

@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/ha/doozerd/consensus"
-	"github.com/ha/doozerd/store"
+	"github.com/coreos/doozerd/consensus"
+	"github.com/coreos/doozerd/store"
 	"log"
 	"net"
 	"syscall"
@@ -48,7 +48,10 @@ func serve(nc net.Conn, st *store.Store, p consensus.Proposer, w bool, rwsk, ros
 		self:     self,
 	}
 
-	c.grant("") // start as if the client supplied a blank password
+	c.grant("") // start as if the client supplied a blank password 
+
+	//c.testAuth()
+
 	c.serve()
 	nc.Close()
 }

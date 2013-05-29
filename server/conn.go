@@ -3,8 +3,8 @@ package server
 import (
 	"code.google.com/p/goprotobuf/proto"
 	"encoding/binary"
-	"github.com/ha/doozerd/consensus"
-	"github.com/ha/doozerd/store"
+	"github.com/coreos/doozerd/consensus"
+	"github.com/coreos/doozerd/store"
 	"io"
 	"log"
 	"sync"
@@ -53,6 +53,27 @@ func (c *conn) read(r *request) error {
 	}
 
 	return proto.Unmarshal(buf, r)
+}
+
+func (c *conn) testAuth() error {
+	var size int32
+
+	err := binary.Read(c.c, binary.BigEndian, &size)
+
+	if err!= nil {
+		return err
+	}
+
+	// buf := make([]byte, size)
+
+	// _, err = io.ReadFull(c.c, buf)
+	// if err != nil {
+	// 	return err
+	// }
+
+	//c.c.Write(buf)
+
+	return err
 }
 
 func (c *conn) write(r *response) error {

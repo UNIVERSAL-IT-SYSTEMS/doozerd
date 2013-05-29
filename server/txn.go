@@ -2,8 +2,8 @@ package server
 
 import (
 	"code.google.com/p/goprotobuf/proto"
-	"github.com/ha/doozerd/consensus"
-	"github.com/ha/doozerd/store"
+	"github.com/coreos/doozerd/consensus"
+	"github.com/coreos/doozerd/store"
 	"io"
 	"log"
 	"sort"
