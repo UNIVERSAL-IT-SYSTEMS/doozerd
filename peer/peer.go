@@ -8,12 +8,12 @@ import (
 	"github.com/coreos/doozerd/server"
 	"github.com/coreos/doozerd/store"
 	"github.com/coreos/doozerd/web"
-	"io"
 	"log"
 	"net"
 	"os"
 	"strings"
 	"time"
+	"strconv"
 )
 
 const (
@@ -209,44 +209,56 @@ func Main(clusterName, self, buri, rwsk, rosk string, cl *doozer.Conn, udpConn *
 func activate(st *store.Store, self string, c *doozer.Conn) int64 {
 	rev, _ := st.Snap()
 
-	for _, base := range store.Getdir(st, calDir) {
-		p := calDir + "/" + base
-		v, rev := st.Get(p)
-		if rev != store.Dir && v[0] == "" {
-			seqn, err := c.Set(p, rev, []byte(self))
-			if err != nil {
-				log.Println(err)
-				continue
-			}
+	entries := store.Getdir(st, calDir)
+	base := entries[len(entries) - 1]
+	index, _ := strconv.ParseInt(base, 10, 32)
+	index += 1
+	p := calDir + "/" + strconv.Itoa(int(index))
+	seqn, err := c.Set(p, rev, []byte(self))
 
-			return seqn
-		}
+	if err != nil {
+		panic(err)
 	}
 
-	for {
-		ch, err := st.Wait(calGlob, rev+1)
-		if err != nil {
-			panic(err)
-		}
-		ev, ok := <-ch
-		if !ok {
-			panic(io.EOF)
-		}
-		rev = ev.Rev
-		// TODO ev.IsEmpty()
-		if ev.IsSet() && ev.Body == "" {
-			seqn, err := c.Set(ev.Path, ev.Rev, []byte(self))
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			return seqn
-		} else if ev.IsSet() && ev.Body == self {
-			return ev.Seqn
-		}
-	}
 
-	return 0
+	// for _, base := range store.Getdir(st, calDir) {
+	// 	p := calDir + "/" + base
+	// 	v, rev := st.Get(p)
+	// 	if rev != store.Dir && v[0] == "" {
+	// 		seqn, err := c.Set(p, rev, []byte(self))
+	// 		if err != nil {
+	// 			log.Println(err)
+	// 			continue
+	// 		}
+
+	// 		return seqn
+	// 	}
+	// }
+
+	// for {
+	// 	ch, err := st.Wait(calGlob, rev+1)
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	ev, ok := <-ch
+	// 	if !ok {
+	// 		panic(io.EOF)
+	// 	}
+	// 	rev = ev.Rev
+	// 	// TODO ev.IsEmpty()
+	// 	if ev.IsSet() && ev.Body == "" {
+	// 		seqn, err := c.Set(ev.Path, ev.Rev, []byte(self))
+	// 		if err != nil {
+	// 			log.Println(err)
+	// 			continue
+	// 		}
+	// 		return seqn
+	// 	} else if ev.IsSet() && ev.Body == self {
+	// 		return ev.Seqn
+	// 	}
+	// }
+
+	return seqn
 }
 
 func advanceUntil(cl *doozer.Conn, ver <-chan int64, done int64) {
